@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 4000;
@@ -31,15 +31,45 @@ async function run() {
 
     // add data from client site
 
-    app.post("/addcrafts", async (req, res) => {
+    app.post("/mycrafts", async (req, res) => {
       const query = req.body;
       const result = await artsCollection.insertOne(query);
       res.send(result);
     });
 
-    // get data from mongodb
+    //get all data from mongo
 
-    
+    app.get("/mycrafts", async (req, res) => {
+      const cursor = artsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // get data for specific id's
+
+    app.get("/mycrafts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await artsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // get data by email from mongodb
+
+    app.get("/mycrafts/:email", async (req, res) => {
+      const query = req.params.email;
+      const result = await artsCollection.find({ email: query }).toArray();
+      res.send(result);
+    });
+
+    //delete data from client site
+
+    app.delete("/mycrafts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await artsCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
