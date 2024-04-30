@@ -26,6 +26,8 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const artsCollection = client.db("art&crafts").collection("arts&crafts");
+    const artsCategory = client.db("art&crafts").collection("category");
+
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
@@ -42,6 +44,21 @@ async function run() {
     app.get("/mycrafts", async (req, res) => {
       const cursor = artsCollection.find();
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/categories", async (req, res) => {
+      const cursor = artsCategory.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/categories/:subcategory_name", async (req, res) => {
+      const result = await artsCollection
+        .find({
+          subcategory_name: req.params.subcategory_name,
+        })
+        .toArray();
       res.send(result);
     });
 
